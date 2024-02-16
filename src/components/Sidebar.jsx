@@ -35,7 +35,6 @@ const Sidebar = () => {
         </NoTaskDiv>
       )}
       {tasks && provider && deletedTasks && (
-
         <TaskListContainer>
           <AnimatedTaskListContainer $expanded={!deletedTaskExpanded}>
             {tasks.length === 0 && (
@@ -145,7 +144,7 @@ const LoadingTask = styled.div`
   padding: 10px 5px;
   background-color: ${colors.subContainerBg};
   border-radius: 5px;
-  height: 40px;
+  min-height: 40px;
   animation: glow 2s infinite;
   @keyframes glow {
     0% {
@@ -326,7 +325,6 @@ const TaskList = styled.div`
 
 const TaskItem = styled.div`
   padding: 10px 5px;
-  height: 40px;
   background-color: ${colors.subContainerBg};
   border-radius: 5px;
   display: flex;

@@ -16,16 +16,19 @@ export const UserProvider = ({ children }) => {
 
   const authenticateUser = useCallback(async () => {
     if (!provider) return;
+
     try {
       const chainId = await provider.getNetwork();
       if (chainId.chainId !== 80001)
         setIsWrongNetwork(true);
+
       const accounts = await provider.listAccounts();
-      if (accounts.length !== 0) {
+
+      if (accounts.length !== 0)
         setUser({ address: accounts[0] });
-      } else {
+      else
         setUser(null);
-      }
+
     } catch (error) {
       console.error("Error authenticating user:", error);
     }
@@ -33,11 +36,14 @@ export const UserProvider = ({ children }) => {
 
   const login = async () => {
     if (!provider) return;
+
     try {
       const chainId = await provider.getNetwork();
       if (chainId.chainId !== 80001)
         setIsWrongNetwork(true);
+
       const accounts = await provider.send("eth_requestAccounts", []);
+
       setUser({ address: accounts[0] });
     } catch (error) {
       console.error("Error logging in user:", error);
@@ -46,6 +52,7 @@ export const UserProvider = ({ children }) => {
 
   const changeNetwork = async () => {
     if (!provider) return;
+
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: '0x13881' }],
@@ -57,6 +64,7 @@ export const UserProvider = ({ children }) => {
 
   const addMumbaiNetwork = async () => {
     if (!provider) return;
+
     await window.ethereum.request({
       method: 'wallet_addEthereumChain',
       params: [
@@ -98,18 +106,17 @@ export const UserProvider = ({ children }) => {
     authenticateUser();
 
     window.ethereum.on('accountsChanged', (accounts) => {
-      if (accounts.length > 0) {
+      if (accounts.length > 0)
         setUser({ address: accounts[0] });
-      } else {
+      else
         setUser(null);
-      }
     });
   }, [authenticateUser, provider]);
 
   useEffect(() => {
-    if (window.ethereum) {
+    if (window.ethereum)
       setProvider(new ethers.providers.Web3Provider(window.ethereum));
-    } else {
+    else {
       setProvider(null);
       setUser(null);
     }

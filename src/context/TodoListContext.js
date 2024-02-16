@@ -20,16 +20,9 @@ export const TodoListProvider = ({ children }) => {
 
   const loadTasks = useCallback(async (setToLastest = false) => {
     try {
-      if (!contract) {
-        console.log("Contract not loaded.");
-        return;
-      }
-      if (!user) {
-        console.log("User not authenticated.");
-        return;
-      }
       if (isWrongNetwork) {
         console.log("Wrong network.");
+        setTasks([]);
         return;
       }
 
@@ -64,21 +57,14 @@ export const TodoListProvider = ({ children }) => {
       console.log("Error loading tasks:", error);
       toast.error("Error loading tasks");
     }
-  }, [contract, isWrongNetwork, user]);
+  }, [contract, isWrongNetwork]);
 
 
   const loadDeletedTasks = useCallback(async () => {
     try {
-      if (!contract) {
-        console.log("Contract not loaded.");
-        return;
-      }
-      if (!user) {
-        console.log("User not authenticated.");
-        return;
-      }
       if (isWrongNetwork) {
         console.log("Wrong network.");
+        setDeletedTasks([]);
         return;
       }
       const taskIds = await contract.getMyDeletedTasks();
@@ -100,16 +86,11 @@ export const TodoListProvider = ({ children }) => {
       console.log("Error loading deleted tasks:", error);
       toast.error("Error loading deleted tasks");
     }
-  }, [contract, isWrongNetwork, user]);
+  }, [contract, isWrongNetwork]);
 
 
   const createTask = async (title, content) => {
     try {
-      if (!user)
-        await authenticateUser();
-      if (isWrongNetwork) {
-        await handleNetworkSwitch();
-      }
       setTasks([...tasks, {
         id: tasks.length + 1,
         title,
@@ -142,12 +123,6 @@ export const TodoListProvider = ({ children }) => {
 
   const toggleCompleted = async (id) => {
     try {
-      if (!user) {
-        await authenticateUser();
-      }
-      if (isWrongNetwork) {
-        await handleNetworkSwitch();
-      }
       const hash = await contract.toggleCompleted(id);
       return hash;
     } catch (error) {
@@ -159,12 +134,6 @@ export const TodoListProvider = ({ children }) => {
 
   const deleteTask = async (id) => {
     try {
-      if (!user) {
-        await authenticateUser();
-      }
-      if (isWrongNetwork) {
-        await handleNetworkSwitch();
-      }
       const hash = await contract.deleteTask(id);
       return hash;
     } catch (error) {
@@ -175,7 +144,7 @@ export const TodoListProvider = ({ children }) => {
 
   useEffect(() => {
     const loadContract = async () => {
-      if (user && !contract && !isWrongNetwork) {
+      if (user && !contract) {
         try {
           const loadedContract = await getContract();
           setContract(loadedContract);
@@ -190,21 +159,17 @@ export const TodoListProvider = ({ children }) => {
     };
 
     loadContract();
-  }, [user, contract, isWrongNetwork]);
+  }, [user, contract]);
 
   useEffect(() => {
-    const initValue = async () => {
-      if (contract && user) {
-        setTasks(undefined);
-        setDeletedTasks(undefined);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    if (contract && user) {
+      setTasks(undefined);
+      setDeletedTasks(undefined);
 
-        loadTasks();
-        loadDeletedTasks();
-      }
-      if (!user) setSelectedTask(null);
+      loadTasks();
+      loadDeletedTasks();
     }
-    initValue();
+    if (!user) setSelectedTask(null);
   }, [contract, loadTasks, loadDeletedTasks, user]);
 
   return (
