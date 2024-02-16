@@ -6,7 +6,13 @@ import { Title, Button, Body } from '../style/Texts';
 import BeatLoader from "react-spinners/BeatLoader";
 
 const LoginBar = () => {
-  const { user, login, isWrongNetwork, changeNetwork } = useUser();
+  const {
+    user,
+    login,
+    isWrongNetwork,
+    handleNetworkSwitch,
+    provider
+  } = useUser();
 
   const shortenAddress = (address) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
@@ -19,9 +25,9 @@ const LoginBar = () => {
         <LoginInfo>
           {isWrongNetwork && (
             <Button
-              onClick={changeNetwork}
+              onClick={handleNetworkSwitch}
               $bgcolor={colors.primary}
-              $hoverbgcolor={colors.primaryDark}
+              $hoverbgcolor={colors.primaryHover}
             >Change Network</Button>
           )}
           <AddressContainer>
@@ -31,13 +37,19 @@ const LoginBar = () => {
           </AddressContainer>
         </LoginInfo>
       ) : (
-        <LoginInfo>
-          <Button
-            onClick={login}
-            $bgcolor={colors.primary}
-            $hoverbgcolor={colors.primaryDark}
-          >Login</Button>
-        </LoginInfo>
+        provider ? (
+          <LoginInfo>
+            <Button
+              onClick={login}
+              $bgcolor={colors.primary}
+              $hoverbgcolor={colors.primaryHover}
+            >Login</Button>
+          </LoginInfo>
+        ) : (
+          <Alterdiv>
+            <Body>Install MetaMask</Body>
+          </Alterdiv>
+        )
       )}
     </LoginContainer>
   );
@@ -61,6 +73,13 @@ const LoginInfo = styled.div`
   justify-content: center;
   text-align: center;
 `;
+
+const Alterdiv = styled.div`
+  background-color: ${colors.dangerBg};
+  padding: 10px;
+  border-radius: 5px;
+`;
+
 
 const AddressContainer = styled.div`
   min-width: 100px;
