@@ -6,6 +6,7 @@ import { Body, Button, SubTitle, Title } from '../style/Texts';
 import { marked } from 'marked';
 import toast from 'react-hot-toast';
 import InformationModalFunction from './Modal';
+import { useUser } from '../context/UserContext';
 
 const Content = () => {
   const { selectedTask, newTask } = useTodoList();
@@ -27,7 +28,7 @@ const DisplayTask = ({ selectedTask }) => {
     <>
       <Header>
         {selectedTask ? (
-          <SubTitle>{selectedTask.id}# {selectedTask.title}</SubTitle>
+          <SubTitle>{selectedTask.title}</SubTitle>
         ) : null}
       </Header>
       <BodyContainer>
@@ -46,7 +47,8 @@ const NewTask = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [preview, setPreview] = useState(false);
-  const { tasks, setNewTask, createTask, loadTasks, setSelectedTask } = useTodoList();
+  const { setNewTask, createTask, loadTasks } = useTodoList();
+  const { user, login } = useUser();
   const [displayModal, setDisplayModal] = useState(false);
   const [hash, setHash] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -54,23 +56,21 @@ const NewTask = () => {
 
   const togglePreview = () => setPreview(!preview);
 
-  const handleCreateTask = () => {
+  const handleCreateTask = async () => {
     try {
       if (!title || !content) {
         toast.error("Title and content are required");
+        return;
       }
+      if (!user) await login();
       setDisplayModal(true);
-      createTask(title, content).then((hash) => {
-        setHash(hash.hash);
-        hash.wait().then(() => {
-          toast.success("Task created successfully");
-          setSuccessMsg("Task created successfully");
-          loadTasks().then(() => {
-            setSelectedTask(tasks[tasks.length - 1]);
-          });
-          setNewTask(false);
-        });
-      });
+      const hash = await createTask(title, content)
+      setHash(hash.hash);
+      await hash.wait();
+      toast.success("Task created successfully");
+      setSuccessMsg("Task created successfully");
+      await loadTasks(true);
+      setNewTask(false);
     } catch (error) {
       console.log("Error creating task:", error);
       setErrorMsg("Error creating task");
