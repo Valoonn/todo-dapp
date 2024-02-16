@@ -26,29 +26,33 @@ const Sidebar = () => {
           />
         </NoTaskDiv>
       )}
-      {tasks && tasks.length === 0 && (
-        <NoTaskDiv>
-          <Body>No Task</Body>
-        </NoTaskDiv>
-      )}
-      {tasks && tasks.length > 0 && (
+      {tasks && (
         <TaskListContainer>
-          <TaskList>
-            {tasks.map((task, index) => {
-              if (task) {
-                return (
-                  <TaskItemFunction
-                    key={index}
-                    task={task}
-                  />
-                );
-              } else {
-                return (
-                  <LoadingTask key={index} />
-                );
-              }
-            })}
-          </TaskList>
+          {tasks.length === 0 && (
+            <>
+              <NoTaskDiv>
+                <Body>No Task</Body>
+              </NoTaskDiv>
+            </>
+          )}
+          {tasks.length > 0 && (
+            <TaskList>
+              {tasks.map((task, index) => {
+                if (task) {
+                  return (
+                    <TaskItemFunction
+                      key={index}
+                      task={task}
+                    />
+                  );
+                } else {
+                  return (
+                    <LoadingTask key={index} />
+                  );
+                }
+              })}
+            </TaskList>
+          )}
           <AddTaskContainer>
             <Button
               $bgcolor={colors.primary}
