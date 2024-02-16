@@ -6,19 +6,22 @@ import { SubTitle, Body, Checkbox, Button } from '../style/Texts';
 import ClockLoader from 'react-spinners/ClockLoader';
 import toast from 'react-hot-toast';
 import Cross from './Svg/Cross';
-import Check from './Svg/Check';
 import BeatLoader from "react-spinners/BeatLoader";
 import InformationModalFunction from './Modal';
+import { useUser } from '../context/UserContext';
+import Arrow from './Svg/Arrow';
 
 const Sidebar = () => {
-  const { tasks, setNewTask } = useTodoList();
+  const { tasks, setNewTask, deletedTasks } = useTodoList();
+  const { provider, user, isWrongNetwork } = useUser();
+  const [deletedTaskExpanded, setDeletedTaskExpanded] = useState(false);
 
   return (
     <SidebarContainer>
       <Header>
         <SubTitle>Tasks</SubTitle>
       </Header>
-      {!tasks && (
+      {!tasks && provider && (
         <NoTaskDiv>
           <BeatLoader
             color={colors.appBg}
@@ -26,46 +29,110 @@ const Sidebar = () => {
           />
         </NoTaskDiv>
       )}
-      {tasks && (
+      {!provider && (
+        <NoTaskDiv>
+          <Body>No Task</Body>
+        </NoTaskDiv>
+      )}
+      {tasks && provider && deletedTasks && (
+
         <TaskListContainer>
-          {tasks.length === 0 && (
-            <>
+          <AnimatedTaskListContainer $expanded={!deletedTaskExpanded}>
+            {tasks.length === 0 && (
               <NoTaskDiv>
                 <Body>No Task</Body>
               </NoTaskDiv>
-            </>
+            )}
+            {tasks.length > 0 && (
+              <TaskList>
+                {tasks.map((task, index) => {
+                  if (task) {
+                    return (
+                      <TaskItemFunction
+                        key={index}
+                        task={task}
+                      />
+                    );
+                  } else {
+                    return (
+                      <LoadingTask key={index} />
+                    );
+                  }
+                })}
+              </TaskList>
+            )}
+          </AnimatedTaskListContainer>
+          {deletedTasks.length > 0 && (
+            <AnimatedTaskListContainer $expanded={deletedTaskExpanded}>
+              <TaskList>
+                {deletedTasks.map((task, index) => {
+                  if (task) {
+                    return (
+                      <TaskItemFunction
+                        key={index}
+                        task={task}
+                        noAction
+                      />
+                    );
+                  } else {
+                    return (
+                      <LoadingTask key={index} />
+                    );
+                  }
+                })}
+              </TaskList>
+            </AnimatedTaskListContainer>
           )}
-          {tasks.length > 0 && (
-            <TaskList>
-              {tasks.map((task, index) => {
-                if (task) {
-                  return (
-                    <TaskItemFunction
-                      key={index}
-                      task={task}
-                    />
-                  );
-                } else {
-                  return (
-                    <LoadingTask key={index} />
-                  );
-                }
-              })}
-            </TaskList>
+          {deletedTasks.length > 0 && (
+            <AddTaskContainer>
+              <TaskItem
+                style={{
+                  cursor: 'pointer',
+                  justifyContent: 'center',
+                  marginBottom: '5px'
+                }}
+                onClick={() => setDeletedTaskExpanded(!deletedTaskExpanded)}
+              >
+                <Arrow
+                  size='20px'
+                  color="black"
+                  width='3'
+                  $hovercolor="black"
+                  rotate={deletedTaskExpanded}
+                  cursor='pointer'
+                />
+                <Body>
+                  Deleted Tasks
+                </Body>
+              </TaskItem>
+            </AddTaskContainer>
           )}
-          <AddTaskContainer>
-            <Button
-              $bgcolor={colors.primary}
-              $hoverbgcolor={colors.primaryHover}
-              onClick={() => setNewTask(true)}
-            >New Task</Button>
-          </AddTaskContainer>
+          {user && !isWrongNetwork && (
+            <AddTaskContainer>
+              <Button
+                $bgcolor={colors.primary}
+                $hoverbgcolor={colors.primaryHover}
+                onClick={() => setNewTask(true)}
+              >New Task</Button>
+            </AddTaskContainer>
+          )}
         </TaskListContainer>
-      )
-      }
+      )}
     </SidebarContainer >
   );
 };
+
+const AnimatedTaskListContainer = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: all 0.5s ease; // Smooth transition for resizing
+  max-height: ${props => props.$expanded ? '100%' : '0'}; // Control size
+  opacity: ${props => props.$expanded ? '1' : '0'}; // Fade in/out
+  overflow: hidden; // Hide content during transition
+`;
+
 
 const AddTaskContainer = styled.div`
   display: flex;
@@ -102,8 +169,10 @@ const TaskListContainer = styled.div`
   margin-bottom: 5px;
 `
 
-const TaskItemFunction = ({ task }) => {
-  const { setSelectedTask,
+const TaskItemFunction = ({ task, noAction = false }) => {
+  const {
+    setSelectedTask,
+    selectedTask,
     toggleCompleted,
     setIsPendingCompleted,
     loadTasks,
@@ -146,6 +215,9 @@ const TaskItemFunction = ({ task }) => {
         loadTasks();
         toast.success("Task removed successfully");
         setSuccessMsg("Task removed successfully");
+        if (selectedTask.id === task.id) {
+          setSelectedTask(null)
+        }
       });
     } catch (error) {
       setErrorMsg("Error removing task");
@@ -172,13 +244,13 @@ const TaskItemFunction = ({ task }) => {
           errorMsg={errorMsg}
         />
         <Body style={{ cursor: 'pointer' }} onClick={() => setSelectedTask(task)}
-        >{task.id}# {task.title}</Body>
+        >{task.title}</Body>
         {task.isPendingCompleted ?
           <ClockLoader
             color="grey"
             size={20}
             onClick={() => setDisplayModal(!displayModal)}
-          /> :
+          /> : !noAction &&
           <ItemOptions>
             <Checkbox
               checked={task.completed}
@@ -224,7 +296,7 @@ const NoTaskDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90%;
+  height: 100%;
   border-radius: 15px;
 `;
 
@@ -238,11 +310,11 @@ const TaskList = styled.div`
     width: 5px;
   }
   &::-webkit-scrollbar-thumb {
-    background: ${colors.appBg};
+    background: ${colors.subContainerBg};
     border-radius: 5px;
   }
   &::-webkit-scrollbar-thumb:hover {
-    background: ${colors.subContainerBg};
+    background: ${colors.appBg};
   }
   & > *:first-child {
     margin-top: 5px;
