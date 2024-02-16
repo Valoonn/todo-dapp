@@ -10,11 +10,15 @@ export const TodoListProvider = ({ children }) => {
   const [deletedTasks, setDeletedTasks] = useState(undefined);
   const [selectedTask, setSelectedTask] = useState(undefined);
   const [newTask, setNewTask] = useState(false);
-
-  const { user, authenticateUser, isWrongNetwork, changeNetwork } = useUser();
+  const {
+    user,
+    authenticateUser,
+    isWrongNetwork,
+    handleNetworkSwitch
+  } = useUser();
   const [contract, setContract] = useState(null);
 
-  const loadTasks = useCallback(async () => {
+  const loadTasks = useCallback(async (setToLastest = false) => {
     try {
       if (!contract) {
         console.log("Contract not loaded.");
@@ -52,12 +56,15 @@ export const TodoListProvider = ({ children }) => {
           return newTasks;
         });
 
+        if (setToLastest && i === taskIds.length - 1) {
+          setSelectedTask(formattedTask);
+        }
       }
     } catch (error) {
       console.log("Error loading tasks:", error);
       toast.error("Error loading tasks");
     }
-  }, [contract, user]);
+  }, [contract, isWrongNetwork, user]);
 
 
   const loadDeletedTasks = useCallback(async () => {
@@ -93,16 +100,15 @@ export const TodoListProvider = ({ children }) => {
       console.log("Error loading deleted tasks:", error);
       toast.error("Error loading deleted tasks");
     }
-  }, [contract, user]);
+  }, [contract, isWrongNetwork, user]);
 
 
   const createTask = async (title, content) => {
     try {
-      if (!user) {
+      if (!user)
         await authenticateUser();
-      }
       if (isWrongNetwork) {
-        await changeNetwork();
+        await handleNetworkSwitch();
       }
       setTasks([...tasks, {
         id: tasks.length + 1,
@@ -140,7 +146,7 @@ export const TodoListProvider = ({ children }) => {
         await authenticateUser();
       }
       if (isWrongNetwork) {
-        await changeNetwork();
+        await handleNetworkSwitch();
       }
       const hash = await contract.toggleCompleted(id);
       return hash;
@@ -157,7 +163,7 @@ export const TodoListProvider = ({ children }) => {
         await authenticateUser();
       }
       if (isWrongNetwork) {
-        await changeNetwork();
+        await handleNetworkSwitch();
       }
       const hash = await contract.deleteTask(id);
       return hash;
@@ -179,6 +185,7 @@ export const TodoListProvider = ({ children }) => {
         }
       } else {
         setTasks([]);
+        setDeletedTasks([]);
       }
     };
 
@@ -189,11 +196,13 @@ export const TodoListProvider = ({ children }) => {
     const initValue = async () => {
       if (contract && user) {
         setTasks(undefined);
+        setDeletedTasks(undefined);
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         loadTasks();
         loadDeletedTasks();
       }
+      if (!user) setSelectedTask(null);
     }
     initValue();
   }, [contract, loadTasks, loadDeletedTasks, user]);
