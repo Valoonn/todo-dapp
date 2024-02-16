@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const TodoListContext = createContext();
 
 export const TodoListProvider = ({ children }) => {
-  const [tasks, setTasks] = useState(undefined);
+  const [tasks, setTasks] = useState([]);
   const [deletedTasks, setDeletedTasks] = useState(undefined);
   const [selectedTask, setSelectedTask] = useState(undefined);
   const [newTask, setNewTask] = useState(false);
@@ -29,10 +29,11 @@ export const TodoListProvider = ({ children }) => {
         return;
       }
 
-      console.log("contract", contract)
       const taskIds = await contract.getMyTasks();
       setTasks(new Array(taskIds.length).fill(undefined));
+
       const tasksPromises = taskIds.map(id => contract.getTask(id));
+
       for (let i = 0; i < taskIds.length; i++) {
         const task = await tasksPromises[i];
         const formattedTask = {
@@ -44,11 +45,13 @@ export const TodoListProvider = ({ children }) => {
           owner: task.owner,
           isPendingCompleted: false
         };
+
         setTasks(tasks => {
           const newTasks = [...tasks];
           newTasks[i] = formattedTask;
           return newTasks;
         });
+
       }
     } catch (error) {
       console.log("Error loading tasks:", error);
@@ -168,13 +171,14 @@ export const TodoListProvider = ({ children }) => {
     const loadContract = async () => {
       if (user && !contract && !isWrongNetwork) {
         try {
-          console.log("Loading contract...");
           const loadedContract = await getContract();
           setContract(loadedContract);
         } catch (error) {
           console.error("Error loading contract:", error);
           toast.error("Error loading contract");
         }
+      } else {
+        setTasks([]);
       }
     };
 
@@ -182,12 +186,16 @@ export const TodoListProvider = ({ children }) => {
   }, [user, contract, isWrongNetwork]);
 
   useEffect(() => {
-    if (!contract) return;
-    console.log("Loading tasks...")
+    const initValue = async () => {
+      if (contract && user) {
+        setTasks(undefined);
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-    loadTasks();
-    loadDeletedTasks();
-
+        loadTasks();
+        loadDeletedTasks();
+      }
+    }
+    initValue();
   }, [contract, loadTasks, loadDeletedTasks, user]);
 
   return (

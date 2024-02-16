@@ -36,17 +36,14 @@ export const UserProvider = ({ children }) => {
   }, [provider]);
 
   const login = async () => {
-    console.log("On login function ")
-
     if (typeof window.ethereum !== 'undefined') {
       try {
-        console.log("On login function ")
         const accounts = await provider.send("eth_requestAccounts", []);
         const chainId = await provider.getNetwork();
         if (chainId.chainId !== 80001) setIsWrongNetwork(true);
         setUser({ address: accounts[0] });
       } catch (error) {
-        console.log("Error logging in user:", error);
+        console.error("Error logging in user:", error);
       }
     } else {
       console.log("Ethereum wallet extension like MetaMask is required.");
@@ -70,7 +67,6 @@ export const UserProvider = ({ children }) => {
     authenticateUser();
 
     window.ethereum.on('accountsChanged', (accounts) => {
-      console.log("accountsChanged", accounts)
       if (accounts.length > 0) {
         setUser({ address: accounts[0] });
       } else {
