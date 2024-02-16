@@ -45,6 +45,7 @@ export const Button = styled.button`
     background-color: #ccc;
     cursor: not-allowed;
   }
+  transition: background-color 0.3s ease;
 `;
 
 export const Input = styled.input`

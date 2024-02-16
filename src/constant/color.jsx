@@ -4,12 +4,13 @@ export const colors = {
   containerBg: '#f3f4f6',
   subContainerBg: '#e9e9e9',
   border: '#ccc',
-  primary: '#5c6ac4',
-  primaryHover: '#4f46e5',
+  primary: '#5c6ac48d',
+  primaryHover: '#4e46e5ac',
   secondary: '#6b7280',
   secondaryHover: '#4b5563',
-  danger: '#ef4444',
-  dangerHover: '#dc2626',
+  danger: '#ef444496',
+  dangerHover: '#dc2626a3',
+  dangerBg: '#ef444467',
 };
 
 const darkColors = {
@@ -24,4 +25,5 @@ const darkColors = {
   secondaryHover: '#4b5563',
   danger: '#ef4444',
   dangerHover: '#dc2626',
+  dangerBg: '#ef4444',
 };
