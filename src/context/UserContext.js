@@ -111,6 +111,11 @@ export const UserProvider = ({ children }) => {
       else
         setUser(null);
     });
+
+    window.ethereum.on('chainChanged', () => {
+      authenticateUser();
+    });
+
   }, [authenticateUser, provider]);
 
   useEffect(() => {
