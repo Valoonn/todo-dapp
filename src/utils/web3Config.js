@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import abi from './todoContractAbi.json';
 
-const contractAddress = "0x45C334d4271a77581600008B1c6B945BC5a111bC";
+const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
 export const getContract = async () => {
   try {

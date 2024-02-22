@@ -1,71 +1,89 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# ToDo DApp Project Documentation
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+The ToDo DApp is a decentralized application that allows users to manage their tasks on the Ethereum blockchain, specifically on the Mumbai Testnet. It leverages smart contracts to create, toggle, and delete tasks securely and transparently. This document outlines the project structure, including the frontend React application and the smart contract development.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **User Authentication**: Users can log in using their Ethereum wallet (e.g., MetaMask).
+- **Task Management**: Users can create new tasks, mark tasks as completed, and delete tasks.
+- **Blockchain Integration**: All task operations are performed on the blockchain, ensuring data integrity and security.
+- **Responsive Design**: The application is designed to be responsive, providing a seamless experience on both desktop and mobile devices.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **Frontend**: React.js, styled-components for styling, ethers.js for Ethereum blockchain interaction.
+- **Smart Contract**: Solidity for Ethereum smart contract, deployed on the Mumbai Testnet.
+- **Other Tools**: react-hot-toast for notifications, react-spinners for loading indicators.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Project Structure
 
-### `npm run build`
+### Frontend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- `App.js`: The main component that wraps other components within `UserProvider` and `TodoListProvider`.
+- `context/UserContext.js`: Context for managing user authentication and network switching.
+- `context/TodoListContext.js`: Context for managing tasks (create, toggle, delete, and fetch tasks).
+- `components/LoginBar.js`: Component for displaying login information and network switching button.
+- `components/Sidebar.js`: Sidebar component for displaying tasks and a button to add new tasks.
+- `components/Content.js`: Main content area for displaying task details or a form to add a new task.
+- `components/Modal.js`: Modal component for displaying transaction information.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Smart Contract
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- `contracts/TodoList.sol`: Solidity smart contract for task management (create, toggle completion, delete tasks).
 
-### `npm run eject`
+## Setup and Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Requirements
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Node.js and npm
+- Ethereum wallet (e.g., MetaMask) installed in your browser
+- An account on the Mumbai Testnet with some test MATIC for transactions
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Steps
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **Clone the Repository**
 
-## Learn More
+   ```
+   git clone https://github.com/your-username/todo-dapp.git
+   cd todo-dapp
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **Install Dependencies**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```
+   npm install
+   ```
 
-### Code Splitting
+3. **Configure Environment**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   - Rename `.env.example` to `.env`.
+   - Update the `REACT_APP_CONTRACT_ADDRESS` with your deployed contract address.
 
-### Analyzing the Bundle Size
+4. **Run the Application**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+   ```
+   npm start
+   ```
 
-### Making a Progressive Web App
+5. **Interact with the DApp**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+   - Open [http://localhost:3000](http://localhost:3000) in your browser.
+   - Connect your Ethereum wallet.
+   - Start managing your tasks on the blockchain!
 
-### Advanced Configuration
+## Smart Contract Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. Compile the smart contract using Hardhat or Truffle.
+2. Deploy the smart contract to the Mumbai Testnet.
+3. Update the frontend `.env` file with the deployed contract address.
 
-### Deployment
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Contributions are welcome! Please fork the repository and submit a pull request with your changes or improvements.
 
-### `npm run build` fails to minify
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# todo-dapp
+This project is licensed under the MIT License. See the `LICENSE` file for details.
